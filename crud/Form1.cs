@@ -55,6 +55,7 @@ namespace crud
 
                 //Cria a conexão com o banco de dados
                 Conexao = new MySqlConnection(data_source);
+                
                 Conexao.Open();
 
                 //Comando SQL para inserir um novo cliente no banco de dados
@@ -66,7 +67,7 @@ namespace crud
                 cmd.Prepare();
                 cmd.CommandText = "INSERT INTO dadosdocliente(nomecompleto, nomesocial, email, cpf) " +
                 "VALUES(@nomecompleto, @nomesocial, @email, @cpf)";
-                
+
                 //Adiciona os parâmetros com os dados do formulário
                 cmd.Parameters.AddWithValue("@nomecompleto", txtNomeCompleto.Text.Trim());
                 cmd.Parameters.AddWithValue("@nomesocial", txtNomeSocial.Text.Trim());
@@ -82,14 +83,25 @@ namespace crud
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
             }
-            catch
+            catch (MySqlException ex)
             {
-
+                //Trata erros relacionados ao MySQL
+                MessageBox.Show("Erro " + ex.Number + " ocorreu: " + ex.Message,
+                                "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
+            catch (Exception ex)
+            {
+                //Trata outros tipos de erro
+                MessageBox.Show("Ocorreu: " + ex.Message,
+                                "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             finally
             {
-
+                //Garante que a conexão com o banco será fechada, mesmo se ocorrer erro
+                if (Conexao != null && Conexao.State == ConnectionState.Open)
+                {
+                    Conexao.Close();
+                }
             }
         }
 
